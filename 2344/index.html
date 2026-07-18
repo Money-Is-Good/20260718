@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>華邦電 2344 — 分析報告 2026/07/18</title>
+<style>
+/* === Catppuccin Mocha 色彩系統（禁止更改 CSS 變數名稱）=== */
+:root{
+  --base:#1e1e2e;--mantle:#181825;--crust:#11111b;
+  --surface0:#313244;--surface1:#45475a;--surface2:#585b70;
+  --overlay0:#6c7086;--overlay1:#7f849c;--text:#cdd6f4;
+  --subtext0:#a6adc8;--subtext1:#bac2de;
+  --blue:#89b4fa;--green:#a6e3a1;--red:#f38ba8;
+  --yellow:#f9e2af;--peach:#fab387;--mauve:#cba6f7;
+  --teal:#94e2d5;--sapphire:#74c7ec;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--base);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.6;padding:0}
+
+/* === Header === */
+.rpt-header{background:var(--mantle);border-bottom:2px solid var(--surface0);padding:20px 32px 16px}
+.rpt-header-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.rpt-badge{background:rgba(203,166,247,.15);border:1px solid rgba(203,166,247,.4);color:var(--mauve);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.rpt-title{font-size:22px;font-weight:700}
+.rpt-meta{display:flex;gap:24px;flex-wrap:wrap}
+.rpt-meta-item{display:flex;flex-direction:column;gap:1px}
+.rpt-meta-label{font-size:10px;color:var(--overlay1);text-transform:uppercase;letter-spacing:.5px}
+.rpt-meta-value{font-size:15px;font-weight:700}
+.mv-up{color:var(--green)}.mv-dn{color:var(--red)}.mv-warn{color:var(--yellow)}.mv-dim{color:var(--subtext1)}
+
+/* === 主容器 === */
+.rpt-body{max-width:1200px;margin:0 auto;padding:24px 32px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:860px){.rpt-body{grid-template-columns:1fr;padding:16px}}
+
+/* === Card === */
+.card{background:var(--mantle);border:1px solid var(--surface0);border-radius:12px;padding:20px}
+.card.full{grid-column:1/-1}
+.card-title{font-size:14px;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--surface0);color:var(--blue);display:flex;align-items:center;gap:8px}
+
+/* === 評分卡 === */
+.score-ring{width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;margin:0 auto 12px;border:4px solid var(--blue)}
+.score-ring.high{border-color:var(--green)}.score-ring.mid{border-color:var(--yellow)}.score-ring.low{border-color:var(--red)}
+.score-num{font-size:32px;font-weight:800;line-height:1}
+.score-sub{font-size:11px;color:var(--subtext0)}
+.score-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.score-card{background:var(--surface0);border-radius:8px;padding:12px;text-align:center}
+.sc-label{font-size:11px;color:var(--subtext0);margin-bottom:4px}
+.sc-val{font-size:20px;font-weight:700}
+
+/* === KV 行 === */
+.kv{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--surface0);font-size:13px}
+.kv:last-child{border-bottom:none}
+.kv-l{color:var(--subtext0);flex-shrink:0;margin-right:8px}
+.kv-r{font-weight:600;text-align:right}
+.pos{color:var(--green)}.neg{color:var(--red)}.warn{color:var(--yellow)}.dim{color:var(--overlay1)}
+
+/* === 表格 === */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--surface0);color:var(--subtext0);text-align:left;padding:7px 10px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+td{padding:7px 10px;border-bottom:1px solid var(--surface0)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(49,50,68,.4)}
+
+/* === Tag === */
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;margin:2px}
+.t-r{background:rgba(243,139,168,.15);color:var(--red)}
+.t-g{background:rgba(166,227,161,.15);color:var(--green)}
+.t-y{background:rgba(249,226,175,.15);color:var(--yellow)}
+.t-b{background:rgba(137,180,250,.15);color:var(--blue)}
+.t-m{background:rgba(203,166,247,.15);color:var(--mauve)}
+
+/* === 籌碼條狀圖 === */
+.chip-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.chip-label{width:52px;font-size:12px;color:var(--subtext0);flex-shrink:0}
+.chip-track{flex:1;height:8px;background:var(--surface1);border-radius:4px;overflow:hidden;position:relative;display:flex}
+.chip-buy{height:100%;background:var(--green);border-radius:4px 0 0 4px}
+.chip-sell{height:100%;background:var(--red);border-radius:0 4px 4px 0;margin-left:auto}
+.chip-net{width:70px;font-size:12px;font-weight:700;text-align:right;flex-shrink:0}
+
+/* === 時間軸 === */
+.tl{position:relative;padding-left:16px}
+.tl::before{content:'';position:absolute;left:4px;top:0;bottom:0;width:2px;background:var(--surface1)}
+.tl-item{position:relative;padding:0 0 16px 16px}
+.tl-item::before{content:'';position:absolute;left:-12px;top:6px;width:8px;height:8px;border-radius:50%;background:var(--overlay1);border:2px solid var(--base)}
+.tl-item.tl-key::before{background:var(--yellow);width:10px;height:10px;left:-13px}
+.tl-item.tl-warn::before{background:var(--red)}
+.tl-item.tl-ok::before{background:var(--green)}
+.tl-date{font-size:11px;color:var(--overlay1);margin-bottom:2px}
+.tl-head{font-weight:700;margin-bottom:3px}
+.tl-body{color:var(--subtext0);font-size:12px;line-height:1.5}
+
+/* === 價格走勢（純 CSS SVG 替代圖表）=== */
+.sparkline-wrap{overflow:hidden;border-radius:6px;background:var(--surface0);padding:2px}
+
+/* === 結論框 === */
+.verdict{border-left:3px solid var(--yellow);background:rgba(249,226,175,.05);padding:12px 16px;border-radius:0 8px 8px 0;margin-top:12px}
+.verdict.vd-g{border-color:var(--green);background:rgba(166,227,161,.05)}
+.verdict.vd-r{border-color:var(--red);background:rgba(243,139,168,.05)}
+.vd-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--yellow);margin-bottom:4px}
+.verdict.vd-g .vd-label{color:var(--green)}.verdict.vd-r .vd-label{color:var(--red)}
+.vd-body{font-size:13px;line-height:1.6}
+
+/* === 進度條 === */
+.bar-wrap{height:6px;background:var(--surface1);border-radius:3px;overflow:hidden;margin-top:4px}
+.bar-fill{height:100%;border-radius:3px}
+
+/* === Footer === */
+.rpt-footer{text-align:center;padding:16px 32px;color:var(--overlay0);font-size:12px;border-top:1px solid var(--surface0);margin-top:8px}
+</style>
+</head>
+<body>
+
+<!-- ① HEADER（必填） -->
+<div class="rpt-header">
+  <div class="rpt-header-top">
+    <span class="rpt-badge">上市 TSE · 半導體業</span>
+    <h1 class="rpt-title">華邦電 2344 — 分析報告</h1>
+  </div>
+  <div class="rpt-meta">
+    <div class="rpt-meta-item">
+      <span class="rpt-meta-label">分析日期</span>
+      <span class="rpt-meta-value mv-dim">2026/07/18</span>
+    </div>
+    <div class="rpt-meta-item">
+      <span class="rpt-meta-label">收盤價</span>
+      <span class="rpt-meta-value mv-dn">$155.0 ▼ 9.88%（收跌停）</span>
+    </div>
+    <div class="rpt-meta-item">
+      <span class="rpt-meta-label">今日成交量</span>
+      <span class="rpt-meta-value mv-dim">107,329 張</span>
+    </div>
+    <div class="rpt-meta-item">
+      <span class="rpt-meta-label">AI 綜合評分</span>
+      <span class="rpt-meta-value mv-dn">20/100</span>
+    </div>
+  </div>
+</div>
+
+<div class="rpt-body">
+
+<!-- ② 評分摘要（必填，full 寬） -->
+<div class="card full">
+  <div class="card-title">綜合評分</div>
+  <div style="display:flex;align-items:center;gap:32px;flex-wrap:wrap">
+    <div>
+      <div class="score-ring low">
+        <div class="score-num">20</div>
+        <div class="score-sub">/ 100</div>
+      </div>
+      <div style="text-align:center;font-size:13px;color:var(--subtext0)">籌碼賣壓與估值評價壓抑評分，基本面營收動能仍具支撐</div>
+    </div>
+    <div class="score-cards" style="flex:1">
+      <div class="score-card">
+        <div class="sc-label">基本面</div>
+        <div class="sc-val warn">20</div>
+        <div class="sc-label">/ 40</div>
+      </div>
+      <div class="score-card">
+        <div class="sc-label">籌碼面</div>
+        <div class="sc-val neg">0</div>
+        <div class="sc-label">/ 30</div>
+      </div>
+      <div class="score-card">
+        <div class="sc-label">事件面</div>
+        <div class="sc-val warn">0</div>
+        <div class="sc-label">/ 30</div>
+      </div>
+    </div>
+    <div style="flex:2;min-width:220px">
+      華邦電（2344）今日收155.0元，較前日重挫9.88%並收在跌停價，成交107,329張。6月合併營收205.97億元、年增189.87%，已連續11個月正成長，惟外資近20日累計賣超325,285張、近5日賣超38,546張，投信近10日亦賣超34,363張，三大法人一致站賣方；千張大戶占比連四週由70.33%降至66.74%，籌碼由大戶流向散戶。AI 投資委員會五席意見呈2偏空、2中性之中衝突格局，依籌碼＞技術＞基本面＞情緒之可信度排序，主席裁決偏空，最終評分3/10、建議觀望偏空。獨立進場勝率評分（Stage 4.3腳本）為62/100（中高），主因月營收由負轉正之催化延續，惟三面訊號共振仍偏空。
+    </div>
+  </div>
+</div>
+
+<!-- ③ 股價資訊（左半） -->
+<div class="card">
+  <div class="card-title">市場行情</div>
+  <div class="kv"><span class="kv-l">收盤價</span><span class="kv-r neg" style="font-size:1.2rem">155.0 元</span></div>
+  <div class="kv"><span class="kv-l">漲跌幅</span><span class="kv-r neg">-9.88%</span></div>
+  <div class="kv"><span class="kv-l">開 / 高 / 低</span><span class="kv-r">159.5 / 162.5 / 155.0</span></div>
+  <div class="kv"><span class="kv-l">成交量</span><span class="kv-r">107,329 張</span></div>
+  <div class="kv"><span class="kv-l">漲停 / 跌停</span><span class="kv-r">189.0 / 155.0</span></div>
+  <div class="kv"><span class="kv-l">爆量起始日</span><span class="kv-r pos">2026/05/07</span></div>
+  <div class="kv"><span class="kv-l">爆量門檻</span><span class="kv-r dim">252,676 張（前5日均×2）</span></div>
+</div>
+
+<!-- ④ 基本面（右半） -->
+<div class="card">
+  <div class="card-title">基本面指標</div>
+  <div class="kv"><span class="kv-l">PER</span><span class="kv-r">176.14 倍</span></div>
+  <div class="kv"><span class="kv-l">PBR</span><span class="kv-r">5.98 倍</span></div>
+  <div class="kv"><span class="kv-l">EPS TTM</span><span class="kv-r neg">0.88 元</span></div>
+  <div class="kv"><span class="kv-l">殖利率</span><span class="kv-r dim">0.32%（偏低）</span></div>
+  <div class="kv"><span class="kv-l">財務評分</span><span class="kv-r">79/100</span></div>
+  <div class="kv"><span class="kv-l">負債比</span><span class="kv-r pos">38.28%</span></div>
+  <div class="kv"><span class="kv-l">52週高/低</span><span class="kv-r dim">233.5 / 16.5</span></div>
+</div>
+
+<!-- ⑤ 季度 EPS（左半） -->
+<div class="card">
+  <div class="card-title">季度 EPS 趨勢</div>
+  <table>
+    <tr><th>期別</th><th style="text-align:right">EPS（元）</th><th style="text-align:right">YoY</th></tr>
+    <tr><td colspan="3" class="dim">暫無季度 EPS 資料（Goodinfo 未提供分季明細；eps_ttm 0.88 元為落後值，Factset 共識 forward EPS 22.18 元）</td></tr>
+  </table>
+</div>
+
+<!-- ⑥ 月營收（右半） -->
+<div class="card">
+  <div class="card-title">月營收趨勢</div>
+  <table>
+    <tr><th>月份</th><th style="text-align:right">營收（百萬）</th><th style="text-align:right">YoY</th><th style="text-align:right">MoM</th></tr>
+    <tr><td>2026/06</td><td style="text-align:right">20,596.8</td><td style="text-align:right" class="pos">+189.87%</td><td style="text-align:right" class="pos">+2.97%</td></tr>
+    <tr><td>2026/05</td><td style="text-align:right">20,001.4</td><td style="text-align:right" class="pos">+181.96%</td><td style="text-align:right" class="pos">+3.93%</td></tr>
+    <tr><td>2026/04</td><td style="text-align:right">19,245.0</td><td style="text-align:right" class="pos">+182.22%</td><td style="text-align:right" class="pos">+32.71%</td></tr>
+    <tr><td>2026/03</td><td style="text-align:right">14,501.4</td><td style="text-align:right" class="pos">+91.49%</td><td style="text-align:right" class="pos">+21.11%</td></tr>
+    <tr><td>2026/02</td><td style="text-align:right">11,973.3</td><td style="text-align:right" class="pos">+88.45%</td><td style="text-align:right" class="pos">+1.65%</td></tr>
+    <tr><td>2026/01</td><td style="text-align:right">11,778.4</td><td style="text-align:right" class="pos">+94.16%</td><td style="text-align:right" class="pos">+20.55%</td></tr>
+  </table>
+</div>
+
+<!-- ⑦ 法人籌碼（full 寬） -->
+<div class="card full">
+  <div class="card-title">法人籌碼（近 10 日）</div>
+
+  <!-- 今日明細 -->
+  <div style="margin-bottom:16px">
+    <div style="font-size:11px;color:var(--overlay1);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">今日明細（最新交易日 2026/07/17，法人日明細較股價揭露延遲一日）</div>
+    <div class="chip-row">
+      <div class="chip-label">外資</div>
+      <div class="chip-track">
+        <div class="chip-buy" style="width:27%"></div>
+        <div class="chip-sell" style="width:73%"></div>
+      </div>
+      <div class="chip-net neg">-28,377 張</div>
+    </div>
+    <div class="chip-row">
+      <div class="chip-label">投信</div>
+      <div class="chip-track">
+        <div class="chip-buy" style="width:40%"></div>
+        <div class="chip-sell" style="width:60%"></div>
+      </div>
+      <div class="chip-net neg">-1,439 張</div>
+    </div>
+    <div class="chip-row">
+      <div class="chip-label">自營商</div>
+      <div class="chip-track">
+        <div class="chip-buy" style="width:0%"></div>
+        <div class="chip-sell" style="width:0%"></div>
+      </div>
+      <div class="chip-net neg">-2,672 張</div>
+    </div>
+  </div>
+
+  <!-- 近10日趨勢表 -->
+  <table>
+    <tr>
+      <th>日期</th>
+      <th style="text-align:right">外資淨（張）</th>
+      <th style="text-align:right">投信淨（張）</th>
+      <th style="text-align:right">自營淨（張）</th>
+      <th style="text-align:right">三大合計（張）</th>
+    </tr>
+    <tr><td>2026/07/03</td><td style="text-align:right" class="neg">-10,317</td><td style="text-align:right" class="neg">-18,106</td><td style="text-align:right" class="pos">+1,692</td><td style="text-align:right" class="neg">-26,730</td></tr>
+    <tr><td>2026/07/06</td><td style="text-align:right" class="neg">-25,654</td><td style="text-align:right" class="neg">-1,417</td><td style="text-align:right" class="pos">+775</td><td style="text-align:right" class="neg">-26,295</td></tr>
+    <tr><td>2026/07/07</td><td style="text-align:right" class="pos">+6,651</td><td style="text-align:right" class="neg">-5,492</td><td style="text-align:right" class="neg">-4,477</td><td style="text-align:right" class="neg">-3,317</td></tr>
+    <tr><td>2026/07/08</td><td style="text-align:right" class="pos">+8,383</td><td style="text-align:right" class="neg">-3,580</td><td style="text-align:right" class="pos">+1,063</td><td style="text-align:right" class="pos">+5,868</td></tr>
+    <tr><td>2026/07/09</td><td style="text-align:right" class="neg">-6,800</td><td style="text-align:right" class="pos">+140</td><td style="text-align:right" class="pos">+1,475</td><td style="text-align:right" class="neg">-5,184</td></tr>
+    <tr><td>2026/07/13</td><td style="text-align:right" class="neg">-13,660</td><td style="text-align:right" class="pos">+10</td><td style="text-align:right" class="neg">-1,033</td><td style="text-align:right" class="neg">-14,683</td></tr>
+    <tr><td>2026/07/14</td><td style="text-align:right" class="neg">-3,968</td><td style="text-align:right" class="pos">+998</td><td style="text-align:right" class="pos">+1,745</td><td style="text-align:right" class="neg">-1,225</td></tr>
+    <tr><td>2026/07/15</td><td style="text-align:right" class="pos">+14,946</td><td style="text-align:right" class="pos">+1,442</td><td style="text-align:right" class="neg">-760</td><td style="text-align:right" class="pos">+15,628</td></tr>
+    <tr><td>2026/07/16</td><td style="text-align:right" class="neg">-7,487</td><td style="text-align:right" class="neg">-6,919</td><td style="text-align:right" class="pos">+1,756</td><td style="text-align:right" class="neg">-12,650</td></tr>
+    <tr><td>2026/07/17</td><td style="text-align:right" class="neg">-28,377</td><td style="text-align:right" class="neg">-1,439</td><td style="text-align:right" class="neg">-2,672</td><td style="text-align:right" class="neg">-32,486</td></tr>
+  </table>
+
+  <!-- 散戶估算 -->
+  <div style="margin-top:10px;padding:10px 14px;background:var(--surface0);border-radius:8px;font-size:13px">
+    <span style="color:var(--mauve);font-weight:700">散戶估算：</span>
+    以07/17資料計算：當日總量107,329張 − 三大法人單邊成交量49,762張（買賣較大一方，即賣方合計）＝散戶約 57,567 張（佔比約 53.6%）。
+  </div>
+</div>
+
+<!-- ⑧ 重大訊息（左半） -->
+<div class="card">
+  <div class="card-title">近期重大訊息</div>
+  <div class="tl">
+    <div class="tl-item tl-key">
+      <div class="tl-date">2026/06/22</div>
+      <div class="tl-head">Wyckoff UTAD 派發訊號</div>
+      <div class="tl-body">盤中衝高233.5元後收回222.0元，量398,844張放量收黑（前5日均量之1.48倍），構成派發區間UTAD訊號，為本輪回撤(Markdown)結構起點。</div>
+    </div>
+    <div class="tl-item tl-warn">
+      <div class="tl-date">2026/07/03～07/06</div>
+      <div class="tl-head">Factset共識同日翻空、券商連續降評</div>
+      <div class="tl-body">07/03共識目標價由236元同日調降至200元；07/04、07/06券商接連降評並喊價193元，追價動能反轉。</div>
+    </div>
+    <div class="tl-item tl-warn">
+      <div class="tl-date">2026/07/05～07/06</div>
+      <div class="tl-head">三大法人連兩週大舉倒貨</div>
+      <div class="tl-body">新聞揭露三大法人連砍華邦電2週帶走297億元，外資賣超前10大苦主榜上有名、單週砍近4萬張，喊買與出貨背離浮現。</div>
+    </div>
+    <div class="tl-item tl-warn">
+      <div class="tl-date">2026/07/13</div>
+      <div class="tl-head">大黑K，賣壓轉強</div>
+      <div class="tl-body">開181.5、收167.0，單日重挫14.5元、實體跌幅7.99%收長黑，成交量147,361張未縮，跌破前波整理平台，偏空訊號明確。</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">2026/07/15</div>
+      <div class="tl-head">券商評等看多，目標價360元</div>
+      <div class="tl-body">07/15當日唯一一家券商發布績效評等報告，評價看多、目標價喊至360元，惟隔日即遭遇國際記憶體股崩跌。</div>
+    </div>
+    <div class="tl-item tl-warn">
+      <div class="tl-date">2026/07/16～07/17</div>
+      <div class="tl-head">記憶體全面崩盤，台股史上最大單日收盤跌點</div>
+      <div class="tl-body">中國長鑫存儲IPO消息震垮SK海力士（重挫逾11%），拖累記憶體全族群；華邦電連兩日摜跌停，台股同步創史上最大單日收盤跌點紀錄。</div>
+    </div>
+    <div class="tl-item tl-warn">
+      <div class="tl-date">2026/07/17</div>
+      <div class="tl-head">今日重挫9.88%收跌停，融券大增</div>
+      <div class="tl-body">收155.0元、跌幅9.88%收在跌停價155.0元；同日融券餘額由2,479張跳增至6,745張，融資餘額同步降至141,088張，散戶去槓桿、空方轉強。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑨ 最新新聞（右半） -->
+<div class="card">
+  <div class="card-title">最新新聞</div>
+  <table>
+    <tr><th>#</th><th>新聞標題</th></tr>
+    <tr><td class="dim">1</td><td><a href="https://tw.stock.yahoo.com/news/%E9%9F%93%E5%9C%8B%E8%A8%98%E6%86%B6%E9%AB%94%E5%B7%A8%E9%A0%AD%E5%9B%9E%E7%A5%9E%EF%BC%81%E8%8F%AF%E9%82%A6%E9%9B%BB%E5%8A%9B%E7%A9%8D%E9%9B%BB%E4%BA%AE%E7%87%88%E6%BC%B2%E5%81%9C%E9%80%BE4%E8%90%AC%E5%BC%B5%E6%8E%92%E9%9A%8A%E7%AD%89%E8%B2%B7-%E5%88%86%E6%9E%90%E5%B8%AB%E6%8F%AD2%E5%A4%A7%E6%8E%A8%E5%8A%9B-015857725.html" target="_blank" style="color:var(--blue)">韓國記憶體巨頭回神！華邦電力積電亮燈漲停逾4萬張排隊等買 分析師揭2大推力</a></td></tr>
+    <tr><td class="dim">2</td><td><a href="https://news.google.com/rss/articles/CBMi0gNBVV95cUxPSUlRRE5kdnJ2eTR3QUZEblFaVTB6Si1DNHJBelRGbmh4ZUtFTVRSVUhsMkRudjNpNk5zUFpFQkFBbmdQeFo2VFg4Z0p6MXpVSmhUWnN5bHotMWt4cEpkOTJOdEZwbTVjeG5hN3BQckg3SVM1Wkw1Qy1HU3c1NlFRUXh0LXUtdmpNd0VpYlVOLXU3MUE5Rjdrb1RaM183MEdiNDNOMU1RSkRuc1NkZFBSNHN5MWlfQjN0eng1Y3FmMWtNU3dBTlYtSm1QM3U5ZkNVXzJ3Sk1QVkw4X1dzUGJYMjlkdmdaRGQ5aEFHSVV6OVFhMWxId1VUVWszVHFlVGFjZkhNNlZELXRXazRGcGpRQWVSaGRvV3Y1RFVzaGpEbmRWcGxQMmx4eUJRYUdiTkstNVVlMjlXb0QwYk50QWVPUlNQdy1fal9OUDRYWGQ3NnNGdEgzVjRyYl80Qmcwd2hmaUExMlo1RU5WNHpORTRvMVhQRWkyekUwdTgyNnNPZUtYVER5aWpPSFB0VWhISGYzZkFYNlo3MW5Ydl9icGI5WThHTDNmWEFxMXJqanl0dTlvYzMwNkFIR0pHX09mRU12dzVIRlhpUHpIRHdfQnNKTUdR?oc=5" target="_blank" style="color:var(--blue)">台股暴跌2953點刷史上最大收盤跌點！台積電慘崩180元收最低 聯電、南亞科、華邦電、欣興全跌停</a></td></tr>
+    <tr><td class="dim">3</td><td><a href="https://news.google.com/rss/articles/CBMipgJBVV95cUxNSFA3Q0RpNGlmN3JvTnZsOGZmdEJIWHd3c3NaSlBNSjk2VEp2Vk5VSHVJNlVpTXNrS2Z6cFoyekg3dVd6cHJUUjJzem5iYS1jejBzZGJiRGxmZGdKcG9oLVZJTS1WaExLU1V2RVlzWnA4N1k4RldDYS1CQkVzRWFzXzRsN1JXRVVNU3hqbFU5WVJjcWgwZHRISU82RElIakpMcVNvUlFIcFotQTNpYndjY0xHSU9fbG5fTUNxU3ljWk9WSlFOeHdiRGlqRDhYMmdBSGltZGR5LVNWSGFldmNxeHRTdkdZSWptdmd1cXZqWUNRTmRSODBoWFBKRGozT05yQmZNcmV1Q2VubHA3aWVFM2w5T1FxNnp2RGZBaXdXcE1sZE43NGc?oc=5" target="_blank" style="color:var(--blue)">記憶體大崩盤！「這檔」連2漲17.8%翻黑同南亞科、華邦電等6檔跌停 威剛、旺宏殺破8%</a></td></tr>
+    <tr><td class="dim">4</td><td><a href="https://news.google.com/rss/articles/CBMiakFVX3lxTE5xN2lYSC10SThsS2k5b0p2MHpsNVNlaVlYS2FoN2FvcjBKUXZTbjliUzZBcktndGo4c3FySGs2T0RGbnI3cktCTGNWcWZMUC1qTE1hTGlSUGQ2NFh2UnEyMmlBU1NlR3NfUmc?oc=5" target="_blank" style="color:var(--blue)">長鑫黑天鵝血洗全球！海力士慘崩11％ 華邦電爆多單踩踏大逃殺 外資高喊「目標360元不變」</a></td></tr>
+    <tr><td class="dim">5</td><td><a href="https://news.google.com/rss/articles/CBMiggRBVV95cUxPVnJlNzF2LUNlSmxucVJGSXBfRWJFRS1VUTRlbTJKS2pZVlFTeXBIWkxqLTFYYlhDYlFLTlhDaFJQMlVnckRUaDJXSjVyV3FaSjJ5UUJlLVdkZFpiYUhVZVB3LUlReGtvMGNqT05nSFFCWmkxcTNQeWFQbW5KM3p1amdCNGc3RDE5Ym93bi1fU0FVYnVHT3J3T2NqeTRzdGZWcEFMS1J5S1pKMkFnTGpiczJYdkZIcUpteVh6RENrMmhSTWVrVV90SERYSVk0bVFjSVYtYkhhNEJsMm9aSFVxNk1rbGM4ZzNHa0h6bnR1VWxoMHh2TFdGQTlfRVM0VDNkUm5FX2Z0X1NDVWp6aXJRQWRZY0ktWFQteUxMYnZ2aWh1MUNLS0VObEpFd3dGMk9ob0ZFdUFTZWhDdFhUNnlnZ1k5dnRFSVNBc0RkR2JfTm10bVloeVM1MWluV2hWWkJsQlR4VUlvbFBxOFBTcVpSa2tVLV83UUY2cGxZSUhEX1VTcHFkeEktQTNHNHQ0UHJtVHVVTUlYMWdiNGw0NEhkdWN5MU55WXpuT0xqTkZtRG9zNVFQTUdHQWJVazYtTWw2d3FzZFBxZDVDS243c2gtbEtRdHVVUGNJMTJXWDdxeF83cUM0VkkxMjFIc2NWNk01c2t1VVo0bjUwLWc1ZUsxOXRn?oc=5" target="_blank" style="color:var(--blue)">華邦電拉回市場在意什麼？從基本面與籌碼結構看記憶體族群的修正訊號</a></td></tr>
+    <tr><td class="dim">6</td><td><a href="https://news.google.com/rss/articles/CBMiX0FVX3lxTE1UaTdtbzRsMEROV2x5U3NnbVFpbmY1dDdYS2JYWVdNU0hJNldfMWxUZ2F5OG10bFRoNkdvbGpZN2V6QVBnY2EzVFllbHJyNWxjU0YtUXRaN01FYUhlSGxn?oc=5" target="_blank" style="color:var(--blue)">百元級指標股外資挺 聯電目標價258元 華邦電喊到360元</a></td></tr>
+    <tr><td class="dim">7</td><td><a href="https://news.google.com/rss/articles/CBMiigFBVV95cUxOeHNhTWpQOXZJTDZzMkZhNXgzTzhheUg3dVJxMU1OcWpfcUMzN0JRb3NHNFpwZFhmcGdrS2x6MExJNFA2bkIwXzdjV0xMMXhBdnd6TXpEeFlqVDdwMmdxUFozYUhUR2JUd2hJR2Q5NzQ0MnE1cUpPajI2X1IxMm9KTmg1Q3J6aFVxSEE?oc=5" target="_blank" style="color:var(--blue)">【07/15券商評等報告彙整】華邦電(2344) 今日僅1家券商發布績效評等報告，評價為看多，目標價為360元</a></td></tr>
+    <tr><td class="dim">8</td><td><a href="https://tw.stock.yahoo.com/news/%E3%80%90%E8%A8%98%E6%86%B6%E9%AB%94%E4%BA%94%E8%99%8E%E5%B0%87%E6%AF%94%E4%B8%80%E6%AF%941%E3%80%91%E8%82%A1%E6%9D%B1%E4%BA%BA%E6%95%B8%E9%BD%8A%E5%89%B5%E6%96%B0%E9%AB%98%EF%BC%815%E5%AE%B6%E5%90%B8%E9%80%BE17%E8%90%AC%E7%B2%89-%E8%8F%AF%E9%82%A6%E9%9B%BB%E6%9C%88%E5%A2%9E%E8%BF%916%E8%90%AC%E4%BA%BA%E6%9C%80%E7%8B%82-043000993.html" target="_blank" style="color:var(--blue)">【記憶體五虎將比一比1】股東人數齊創新高！5家吸逾17萬粉 華邦電月增近6萬人最狂</a></td></tr>
+    <tr><td class="dim">9</td><td><a href="https://news.google.com/rss/articles/CBMiiAFBVV95cUxQNFVBOE1XLWZOeFJSYktpNWRUOHl2RzR4YnN3RnFZekVMN1hhdG1RSm0wNkk5UkdESkUxTGFUdDFaaFUwSnZRZUhIRF9yQWFWR29hM0pGbnpITGlEbHBnd0EwQ0Y5X0hRU3NEamNDU2dnbkpTY2szMENOaUk1SDFnTjB5WGZvRk1h?oc=5" target="_blank" style="color:var(--blue)">《7月15日融券動態3-2》華邦電(1.24%)、晶豪科(1.06%)</a></td></tr>
+    <tr><td class="dim">10</td><td><a href="https://news.google.com/rss/articles/CBMiWEFVX3lxTFBhOXl2eE45S2hxWTdUanZlamtnNEFJUmozS3U3NVlIN1Z2bDVRZmY3UE5kZnpwUFVDY2Y2a1JVckJsY0lBT3pFSld5bnhGaEgxSm5nTnM4ODk?oc=5" target="_blank" style="color:var(--blue)">2344 華邦電- 外資放空不用在市場買回回補空單- 股市爆料同學會</a></td></tr>
+  </table>
+</div>
+
+<!-- ⑩ AI 分析文字（full 寬） -->
+<div class="card full">
+  <div class="card-title">AI 多面向分析</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div>
+      <div style="font-size:11px;color:var(--blue);font-weight:700;text-transform:uppercase;margin-bottom:6px">技術面</div>
+      <div style="font-size:13px;color:var(--subtext0);line-height:1.6">現價155元較MA20(187.5)乖離-17.34%，位於MA5(167.8)與MA20之下，僅略高於MA60(153.98)，短中期均線呈MA20&gt;MA5&gt;MA60的轉弱排列。RSI14為40.64處中性偏弱區。KD之K值30.68低於D值31.46、雙線於中性區同步下彎，未見黃金交叉。MACD之DIF(-1.63)下穿0軸並低於DEA(3.25)，柱狀體-4.87負值續擴，呈空頭排列。今日重挫9.88%跌破前波支撐，下方支撐146元、上方壓力遠在200元。整體技術面偏空。（另：07/13出現大黑K訊號，開181.5收167.0，實體跌幅7.99%，宣告賣壓轉強）</div>
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--green);font-weight:700;text-transform:uppercase;margin-bottom:6px">量能面</div>
+      <div style="font-size:13px;color:var(--subtext0);line-height:1.6">今日量107,329張，同時低於MA5(126,338)、MA20(191,972)與MA60(220,886)，量能全面萎縮，爆量倍數僅0.8倍。60日量能趨勢萎縮，MA5遠低於MA60，反映追價動能退潮。月均量M3(179,991)→M2(238,487)→M1(203,285)呈先增後減震盪。近90日天量落於05/27達435,175張(收155元)，該日後5日累計+14.5%，惟今日已回落至155元，天量至今累計漲幅0.0%，起漲漲幅已全數回吐。今日殺盤伴隨量縮，屬跌勢中量能退潮而非恐慌性大量出貨。</div>
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--mauve);font-weight:700;text-transform:uppercase;margin-bottom:6px">籌碼面</div>
+      <div style="font-size:13px;color:var(--subtext0);line-height:1.6">三大法人一致賣超，外資近5/10/20日累計淨賣-38,546/-66,283/-325,285張，投信近5/10日-5,908/-34,363張，07/17當日外資-28,377、投信-1,439、自營-2,672張同步出貨。07/17融券餘額由2,479張跳增至6,745張，空方籌碼轉趨積極。千張大戶占比66.74%、人數251戶（週減5戶），對照分級週序列大戶占比自06/26的70.33%連四週降至66.74%、散戶(&lt;100張)占比同期由22.38%升至26.05%，籌碼由大戶流向散戶。隱性主力無異常訊號（score 0），上方219.0~233.5元存看跌OB壓力，量價訊號與法人賣超方向一致，共同指向派發格局。籌碼結構：外資主導，整體偏空；集中度結論：籌碼鬆動。</div>
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--yellow);font-weight:700;text-transform:uppercase;margin-bottom:6px">基本面</div>
+      <div style="font-size:13px;color:var(--subtext0);line-height:1.6">無季度EPS明細可佐證獲利軌跡；eps_ttm僅0.88元為過去下行週期之落後值，使trailing PER高達176倍失真，惟forward_eps達22.18元（Factset共識），對應forward PER約7.0倍，反映記憶體上行週期獲利爆發預期。財務體質：負債比38.28%偏低、流動比1.474短期償債健全，惟自由現金流-106.64億元、fin_fcf_signal亮警示，係擴產資本支出侵蝕現金。ROE 12.93%、BPS 25.922元。整體呈資產負債穩健、現金流吃緊的擴產成長期格局，估值合理性須以forward獲利實際兌現為前提。</div>
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--peach);font-weight:700;text-transform:uppercase;margin-bottom:6px">營收面</div>
+      <div style="font-size:13px;color:var(--subtext0);line-height:1.6">6月營收205.97億元（20,596.8百萬），年增189.87%、月增2.97%，續創新高。YoY自2025年8月由負轉正後連11個月正成長，且逐月加速（4月+182.22%、5月+181.96%、6月+189.87%），本輪成長週期轉折已確立。月增動能延續但邊際趨緩（4月+32.71%→5月+3.93%→6月+2.97%），反映高基期下擴張趨穩，屬持續性週期而非單月一次性爆發，營收動能強勁且具延續性。</div>
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--teal);font-weight:700;text-transform:uppercase;margin-bottom:6px">新聞情緒</div>
+      <div style="font-size:13px;color:var(--subtext0);line-height:1.6">整體新聞情緒正面（分數0.25~0.33），news_analyst_rating買進、評等調升，惟近期多空劇烈拉鋸。利多面：6月營收年增189.87%創高、SK海力士示警記憶體史上最嚴重短缺、SLC NAND報價大漲、外資喊目標價240~360元、國家隊斥資承接。利空面：7/16-7/17記憶體崩盤，華邦電摜跌停，台股寫史上最大單日收盤跌點，中國長鑫存儲IPO震垮SK海力士並拖累全族群、7/4遭降評、外資單日重砍2萬張。題材面偏多但受國際記憶體股價劇震與籌碼倒貨影響，短線波動風險偏高。</div>
+    </div>
+  </div>
+
+  <!-- 看多 / 看空論點 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+    <div style="background:rgba(166,227,161,.07);border:1px solid rgba(166,227,161,.2);border-radius:8px;padding:14px">
+      <div style="color:var(--green);font-size:11px;font-weight:700;text-transform:uppercase;margin-bottom:8px">看多論點</div>
+      <div style="font-size:13px;color:var(--subtext0);line-height:1.7">
+        <div>• 6月營收205.97億元，年增189.87%，已連續11個月正成長，上半年營收年增達139%，成長週期已確立。</div>
+        <div>• Factset共識目標價236元，較現價155元仍有約+52.3%空間；forward EPS 22.18元，對應forward PER約7.0倍，反映記憶體上行週期獲利爆發預期。</div>
+        <div>• 財務體質穩健：負債比38.28%偏低、流動比1.474，短期償債能力健全。</div>
+        <div>• 產業題材：SK海力士示警記憶體史上最嚴重短缺，SLC NAND、DRAM報價持續上揚，題材面仍偏多。</div>
+      </div>
+    </div>
+    <div style="background:rgba(243,139,168,.07);border:1px solid rgba(243,139,168,.2);border-radius:8px;padding:14px">
+      <div style="color:var(--red);font-size:11px;font-weight:700;text-transform:uppercase;margin-bottom:8px">看空論點</div>
+      <div style="font-size:13px;color:var(--subtext0);line-height:1.7">
+        <div>• 三大法人一致賣超：外資近20日淨賣325,285張、近5日賣38,546張，投信近10日賣34,363張，籌碼壓力沉重。</div>
+        <div>• 千張大戶占比連四週由70.33%降至66.74%，人數週減5戶，散戶(&lt;100張)占比同期由22.38%升至26.05%，籌碼由大戶流向散戶。</div>
+        <div>• 分析師報告觸發「過熱」與「PER虛胖」旗標：90日累積上修+68.0%主要靠估值倍數擴張(+41.2pp)而非EPS上修，且喊買期間法人實際淨賣，構成喊買出貨背離。</div>
+        <div>• 今日重挫9.88%收155.0元跌停，跌破MA5/MA20，MACD死叉，Wyckoff結構於06/22構成UTAD後轉入回撤(Markdown)。</div>
+        <div>• 自由現金流為負10,664萬元（-106.64億），FCF亮警示；trailing PER高達176倍，估值偏貴。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 最終結論 -->
+  <div class="verdict vd-r" style="margin-top:16px">
+    <div class="vd-label">偏空（AI投資委員會合議，評分3/10）</div>
+    <div class="vd-body">華邦電(2344)受惠記憶體循環復甦題材、6月營收年增189.87%創高，forward PER約7倍具中長線想像；惟短中期籌碼與技術明確轉空——外資近20日淨賣32.5萬張、大戶占比連四週滑落、現價155失守MA5/MA20並MACD死叉、Wyckoff轉入Markdown。共識目標價236元但已過熱且喊買出貨背離，7/17重挫9.88%追價動能反轉。委員會呈2偏空、2中性之中衝突格局，依可信度排序（籌碼&gt;技術&gt;基本面&gt;情緒）裁決偏空，反彈至190元前不宜追多，評分3分風險偏高。獨立進場勝率評分（Stage 4.3）62/100（中高），主因月營收由負轉正之催化延續，惟三面訊號共振偏空(-1)，需待籌碼止穩再確認。</div>
+  </div>
+</div>
+
+<!-- ⑪ 資料來源與可信度（full 寬） -->
+<div class="card full">
+  <div class="card-title">資料來源與可信度</div>
+  <table>
+    <tr><th>模組</th><th>說明</th><th style="text-align:center">狀態</th><th>取得值摘要</th></tr>
+    <tr>
+      <td>即時股價（TWSE MIS API）</td>
+      <td class="dim">收盤價/開高低/成交量/漲跌停</td>
+      <td style="text-align:center"><span class="tag t-g">✓ 成功</span></td>
+      <td class="dim" style="font-size:12px">155.0元，-9.88%，收跌停155.0元，量107,329張</td>
+    </tr>
+    <tr>
+      <td>三大法人籌碼（FinMind/TPEX）</td>
+      <td class="dim">外資/投信/自營逐日買賣超</td>
+      <td style="text-align:center"><span class="tag t-y">△ 部分成功</span></td>
+      <td class="dim" style="font-size:12px">最新可用為07/17（外資-28,377張），07/18當日資料尚未更新</td>
+    </tr>
+    <tr>
+      <td>財務指標（Goodinfo）</td>
+      <td class="dim">PER/PBR/財務評分/股利/負債比</td>
+      <td style="text-align:center"><span class="tag t-y">△ 部分成功</span></td>
+      <td class="dim" style="font-size:12px">PER 176.14倍、財務評分79/100；季度EPS明細缺失</td>
+    </tr>
+    <tr>
+      <td>股東持股分級（TDCC）</td>
+      <td class="dim">千張大戶/散戶/中實戶週序列</td>
+      <td style="text-align:center"><span class="tag t-g">✓ 成功</span></td>
+      <td class="dim" style="font-size:12px">千張大戶占比66.74%，週減5戶，資料日2026/07/17</td>
+    </tr>
+    <tr>
+      <td>月營收（MOPS）</td>
+      <td class="dim">月營收/YoY/MoM</td>
+      <td style="text-align:center"><span class="tag t-g">✓ 成功</span></td>
+      <td class="dim" style="font-size:12px">6月營收205.97億元，年增189.87%</td>
+    </tr>
+    <tr>
+      <td>新聞（Yahoo股市/鉅亨網/Google News）</td>
+      <td class="dim">新聞情緒/事件/籌碼消息</td>
+      <td style="text-align:center"><span class="tag t-g">✓ 成功</span></td>
+      <td class="dim" style="font-size:12px">爬取15則｜相關3則｜可信3則；情緒分數0.33正面</td>
+    </tr>
+    <tr>
+      <td>分析師報告共識（Factset via 鉅亨網）</td>
+      <td class="dim">共識目標價/EPS修正軌跡/過熱旗標</td>
+      <td style="text-align:center"><span class="tag t-g">✓ 成功</span></td>
+      <td class="dim" style="font-size:12px">共識目標價236元，90日上修7次/下修3次，已觸發「過熱」與「PER虛胖」</td>
+    </tr>
+    <tr>
+      <td>券商分點進出（TWSE）</td>
+      <td class="dim">主力買賣超券商分點</td>
+      <td style="text-align:center"><span class="tag t-r">✗ 資料不足</span></td>
+      <td class="dim" style="font-size:12px">可用交易日數不足3日，暫無法判讀集中度</td>
+    </tr>
+  </table>
+</div>
+
+</div><!-- end .rpt-body -->
+
+<!-- ⑫ Footer（必填） -->
+<div class="rpt-footer">
+  報告生成時間：2026-07-18 | 股票代號 2344 | 市場 上市 TSE<br>
+  資料來自公開免費平台（TWSE MIS、Goodinfo、Yahoo Finance、MOPS、Yahoo 股市新聞、鉅亨網、Google News、FinMind、TDCC），僅供研究參考，不構成任何投資建議
+</div>
+</body>
+</html>
