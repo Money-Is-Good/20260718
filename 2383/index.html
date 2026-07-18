@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>台光電 2383 — 分析報告 2026/07/18</title>
+<style>
+/* === Catppuccin Mocha 色彩系統（禁止更改 CSS 變數名稱）=== */
+:root{
+  --base:#1e1e2e;--mantle:#181825;--crust:#11111b;
+  --surface0:#313244;--surface1:#45475a;--surface2:#585b70;
+  --overlay0:#6c7086;--overlay1:#7f849c;--text:#cdd6f4;
+  --subtext0:#a6adc8;--subtext1:#bac2de;
+  --blue:#89b4fa;--green:#a6e3a1;--red:#f38ba8;
+  --yellow:#f9e2af;--peach:#fab387;--mauve:#cba6f7;
+  --teal:#94e2d5;--sapphire:#74c7ec;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--base);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.6;padding:0}
+
+/* === Header === */
+.rpt-header{background:var(--mantle);border-bottom:2px solid var(--surface0);padding:20px 32px 16px}
+.rpt-header-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.rpt-badge{background:rgba(203,166,247,.15);border:1px solid rgba(203,166,247,.4);color:var(--mauve);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.rpt-title{font-size:22px;font-weight:700}
+.rpt-meta{display:flex;gap:24px;flex-wrap:wrap}
+.rpt-meta-item{display:flex;flex-direction:column;gap:1px}
+.rpt-meta-label{font-size:10px;color:var(--overlay1);text-transform:uppercase;letter-spacing:.5px}
+.rpt-meta-value{font-size:15px;font-weight:700}
+.mv-up{color:var(--green)}.mv-dn{color:var(--red)}.mv-warn{color:var(--yellow)}.mv-dim{color:var(--subtext1)}
+
+/* === 主容器 === */
+.rpt-body{max-width:1200px;margin:0 auto;padding:24px 32px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:860px){.rpt-body{grid-template-columns:1fr;padding:16px}}
+
+/* === Card === */
+.card{background:var(--mantle);border:1px solid var(--surface0);border-radius:12px;padding:20px}
+.card.full{grid-column:1/-1}
+.card-title{font-size:14px;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--surface0);color:var(--blue);display:flex;align-items:center;gap:8px}
+
+/* === 評分卡 === */
+.score-ring{width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;margin:0 auto 12px;border:4px solid var(--blue)}
+.score-ring.high{border-color:var(--green)}.score-ring.mid{border-color:var(--yellow)}.score-ring.low{border-color:var(--red)}
+.score-num{font-size:32px;font-weight:800;line-height:1}
+.score-sub{font-size:11px;color:var(--subtext0)}
+.score-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.score-card{background:var(--surface0);border-radius:8px;padding:12px;text-align:center}
+.sc-label{font-size:11px;color:var(--subtext0);margin-bottom:4px}
+.sc-val{font-size:20px;font-weight:700}
+
+/* === KV 行 === */
+.kv{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--surface0);font-size:13px}
+.kv:last-child{border-bottom:none}
+.kv-l{color:var(--subtext0);flex-shrink:0;margin-right:8px}
+.kv-r{font-weight:600;text-align:right}
+.pos{color:var(--green)}.neg{color:var(--red)}.warn{color:var(--yellow)}.dim{color:var(--overlay1)}
+
+/* === 表格 === */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--surface0);color:var(--subtext0);text-align:left;padding:7px 10px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+td{padding:7px 10px;border-bottom:1px solid var(--surface0)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(49,50,68,.4)}
+
+/* === Tag === */
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;margin:2px}
+.t-r{background:rgba(243,139,168,.15);color:var(--red)}
+.t-g{background:rgba(166,227,161,.15);color:var(--green)}
+.t-y{background:rgba(249,226,175,.15);color:var(--yellow)}
+.t-b{background:rgba(137,180,250,.15);color:var(--blue)}
+.t-m{background:rgba(203,166,247,.15);color:var(--mauve)}
+
+/* === 籌碼條狀圖 === */
+.chip-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.chip-label{width:52px;font-size:12px;color:var(--subtext0);flex-shrink:0}
+.chip-track{flex:1;height:8px;background:var(--surface1);border-radius:4px;overflow:hidden;position:relative;display:flex}
+.chip-buy{height:100%;background:var(--green);border-radius:4px 0 0 4px}
+.chip-sell{height:100%;background:var(--red);border-radius:0 4px 4px 0;margin-left:auto}
+.chip-net{width:70px;font-size:12px;font-weight:700;text-align:right;flex-shrink:0}
+
+/* === 時間軸 === */
+.tl{position:relative;padding-left:16px}
+.tl::before{content:'';position:absolute;left:4px;top:0;bottom:0;width:2px;background:var(--surface1)}
+.tl-item{position:relative;padding:0 0 16px 16px}
+.tl-item::before{content:'';position:absolute;left:-12px;top:6px;width:8px;height:8px;border-radius:50%;background:var(--overlay1);border:2px solid var(--base)}
+.tl-item.tl-key::before{background:var(--yellow);width:10px;height:10px;left:-13px}
+.tl-item.tl-warn::before{background:var(--red)}
+.tl-item.tl-ok::before{background:var(--green)}
+.tl-date{font-size:11px;color:var(--overlay1);margin-bottom:2px}
+.tl-head{font-weight:700;margin-bottom:3px}
+.tl-body{color:var(--subtext0);font-size:12px;line-height:1.5}
+
+/* === 價格走勢（純 CSS SVG 替代圖表）=== */
+.sparkline-wrap{overflow:hidden;border-radius:6px;background:var(--surface0);padding:2px}
+
+/* === 結論框 === */
+.verdict{border-left:3px solid var(--yellow);background:rgba(249,226,175,.05);padding:12px 16px;border-radius:0 8px 8px 0;margin-top:12px}
+.verdict.vd-g{border-color:var(--green);background:rgba(166,227,161,.05)}
+.verdict.vd-r{border-color:var(--red);background:rgba(243,139,168,.05)}
+.vd-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--yellow);margin-bottom:4px}
+.verdict.vd-g .vd-label{color:var(--green)}.verdict.vd-r .vd-label{color:var(--red)}
+.vd-body{font-size:13px;line-height:1.6}
+
+/* === 進度條 === */
+.bar-wrap{height:6px;background:var(--surface1);border-radius:3px;overflow:hidden;margin-top:4px}
+.bar-fill{height:100%;border-radius:3px}
+
+/* === Footer === */
+.rpt-footer{text-align:center;padding:16px 32px;color:var(--overlay0);font-size:12px;border-top:1px solid var(--surface0);margin-top:8px}
+</style>
+</head>
+<body>
+
+<!-- ① HEADER（必填） -->
+<div class="rpt-header">
+  <div class="rpt-header-top">
+    <span class="rpt-badge">上市 TSE ・ 電子零組件業</span>
+    <h1 class="rpt-title">台光電 2383 — 分析報告</h1>
+  </div>
+  <div class="rpt-meta">
+    <div class="rpt-meta-item">
+      <span class="rpt-meta-label">分析日期</span>
+      <span class="rpt-meta-value mv-dim">2026/07/18</span>
+    </div>
+    <div class="rpt-meta-item">
+      <span class="rpt-meta-label">收盤價</span>
+      <span class="rpt-meta-value mv-dn">$4,495.0 ▼ 9.92%</span>
+    </div>
+    <div class="rpt-meta-item">
+      <span class="rpt-meta-label">今日成交量</span>
+      <span class="rpt-meta-value mv-dim">2,723 張</span>
+    </div>
+    <div class="rpt-meta-item">
+      <span class="rpt-meta-label">AI 綜合評分</span>
+      <span class="rpt-meta-value mv-warn">50/100</span>
+    </div>
+  </div>
+</div>
+
+<div class="rpt-body">
+
+<!-- ② 評分摘要（必填，full 寬） -->
+<div class="card full">
+  <div class="card-title">綜合評分</div>
+  <div style="display:flex;align-items:center;gap:32px;flex-wrap:wrap">
+    <div>
+      <div class="score-ring mid">
+        <div class="score-num">50</div>
+        <div class="score-sub">/ 100</div>
+      </div>
+      <div style="text-align:center;font-size:13px;color:var(--subtext0)">中性觀望：基本面與籌碼具支撐，技術結構明顯轉弱</div>
+    </div>
+    <div class="score-cards" style="flex:1">
+      <div class="score-card">
+        <div class="sc-label">基本面</div>
+        <div class="sc-val warn">20</div>
+        <div class="sc-label">/ 40</div>
+      </div>
+      <div class="score-card">
+        <div class="sc-label">籌碼面</div>
+        <div class="sc-val warn">15</div>
+        <div class="sc-label">/ 30</div>
+      </div>
+      <div class="score-card">
+        <div class="sc-label">事件面</div>
+        <div class="sc-val warn">15</div>
+        <div class="sc-label">/ 30</div>
+      </div>
+    </div>
+    <div style="flex:2;min-width:220px">
+      台光電6月合併營收177.33億元、年增120.69%，連續3個月正成長且逐月加速，ROE達40.68%，財務評分62/100。籌碼面千張大戶占比由57.16%升至57.95%、戶數週增3戶至64戶，投信連11日買超、10日累計淨買878張，惟外資近10日淨賣1,343張。技術面現價4,495元跌破MA5(4,932)、MA20(5,367.5)、MA60(5,032.4)三均線，MACD柱狀體-117.26呈空方運行，Wyckoff結構於07/06 UTAD假突破後轉入回撤(Markdown)階段。07/17台股系統性股災（加權指數-6.47%）與個股自高檔6,250元回落共同構成本輪重挫背景，AI投資委員會判定為高衝突、綜合評分4/10、建議觀望。
+    </div>
+  </div>
+</div>
+
+<!-- ③ 股價資訊（左半） -->
+<div class="card">
+  <div class="card-title">市場行情</div>
+  <div class="kv"><span class="kv-l">收盤價</span><span class="kv-r neg" style="font-size:1.2rem">4,495.0 元</span></div>
+  <div class="kv"><span class="kv-l">漲跌幅</span><span class="kv-r neg">-9.92%</span></div>
+  <div class="kv"><span class="kv-l">開 / 高 / 低</span><span class="kv-r">4,715.0 / 4,835.0 / 4,495.0</span></div>
+  <div class="kv"><span class="kv-l">成交量</span><span class="kv-r">2,723 張</span></div>
+  <div class="kv"><span class="kv-l">漲停 / 跌停</span><span class="kv-r">5,485.0 / 4,495.0（今日觸及跌停）</span></div>
+  <div class="kv"><span class="kv-l">爆量起始日</span><span class="kv-r dim">—</span></div>
+  <div class="kv"><span class="kv-l">爆量門檻</span><span class="kv-r dim">3,747 張（前5日均×2）</span></div>
+</div>
+
+<!-- ④ 基本面（右半） -->
+<div class="card">
+  <div class="card-title">基本面指標</div>
+  <div class="kv"><span class="kv-l">PER</span><span class="kv-r">98.04 倍</span></div>
+  <div class="kv"><span class="kv-l">PBR</span><span class="kv-r">33.59 倍</span></div>
+  <div class="kv"><span class="kv-l">EPS TTM</span><span class="kv-r pos">45.85 元</span></div>
+  <div class="kv"><span class="kv-l">殖利率</span><span class="kv-r dim">0.37%（低於市場均值3.75%）</span></div>
+  <div class="kv"><span class="kv-l">財務評分</span><span class="kv-r">62/100</span></div>
+  <div class="kv"><span class="kv-l">負債比</span><span class="kv-r pos">34.45%</span></div>
+  <div class="kv"><span class="kv-l">52週高/低</span><span class="kv-r dim">6,250.0 / 979.0</span></div>
+</div>
+
+<!-- ⑤ 季度 EPS（左半） -->
+<div class="card">
+  <div class="card-title">季度 EPS 趨勢</div>
+  <table>
+    <tr><th>期別</th><th style="text-align:right">EPS（元）</th><th style="text-align:right">YoY</th></tr>
+    <tr><td colspan="3" class="dim">暫無季度 EPS 資料（CSV 未提供季度欄位，僅有 TTM EPS 45.85 元）</td></tr>
+  </table>
+</div>
+
+<!-- ⑥ 月營收（右半） -->
+<div class="card">
+  <div class="card-title">月營收趨勢</div>
+  <table>
+    <tr><th>月份</th><th style="text-align:right">營收（百萬）</th><th style="text-align:right">YoY</th><th style="text-align:right">MoM</th></tr>
+    <tr><td>2026/06</td><td style="text-align:right">17,733</td><td style="text-align:right" class="pos">+120.69%</td><td style="text-align:right" class="pos">+13.53%</td></tr>
+    <tr><td>2026/05</td><td style="text-align:right">15,619</td><td style="text-align:right" class="pos">+114.62%</td><td style="text-align:right" class="pos">+12.17%</td></tr>
+    <tr><td>2026/04</td><td style="text-align:right">13,924</td><td style="text-align:right" class="pos">+93.61%</td><td style="text-align:right" class="pos">+15.92%</td></tr>
+    <tr><td>2026/03</td><td style="text-align:right">12,011</td><td style="text-align:right" class="pos">+56.63%</td><td style="text-align:right" class="pos">+17.82%</td></tr>
+    <tr><td>2026/02</td><td style="text-align:right">10,194</td><td style="text-align:right" class="pos">+45.00%</td><td style="text-align:right" class="neg">-6.15%</td></tr>
+    <tr><td>2026/01</td><td style="text-align:right">10,863</td><td style="text-align:right" class="pos">+55.48%</td><td style="text-align:right" class="pos">+24.79%</td></tr>
+  </table>
+</div>
+
+<!-- ⑦ 法人籌碼（full 寬） -->
+<div class="card full">
+  <div class="card-title">法人籌碼（近 10 日）</div>
+
+  <!-- 今日明細 -->
+  <div style="margin-bottom:16px">
+    <div style="font-size:11px;color:var(--overlay1);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">今日明細（07/17）</div>
+    <div class="chip-row">
+      <div class="chip-label">外資</div>
+      <div class="chip-track">
+        <div class="chip-buy" style="width:53%"></div>
+        <div class="chip-sell" style="width:47%"></div>
+      </div>
+      <div class="chip-net pos">+249 張</div>
+    </div>
+    <div class="chip-row">
+      <div class="chip-label">投信</div>
+      <div class="chip-track">
+        <div class="chip-buy" style="width:68%"></div>
+        <div class="chip-sell" style="width:32%"></div>
+      </div>
+      <div class="chip-net pos">+39 張</div>
+    </div>
+    <div class="chip-row">
+      <div class="chip-label">自營商</div>
+      <div class="chip-track">
+        <div class="chip-buy" style="width:100%"></div>
+        <div class="chip-sell" style="width:0%"></div>
+      </div>
+      <div class="chip-net pos">+75 張</div>
+    </div>
+  </div>
+
+  <!-- 近10日趨勢表 -->
+  <table>
+    <tr>
+      <th>日期</th>
+      <th style="text-align:right">外資淨（張）</th>
+      <th style="text-align:right">投信淨（張）</th>
+      <th style="text-align:right">自營淨（張）</th>
+      <th style="text-align:right">三大合計（張）</th>
+    </tr>
+    <tr><td>07/03</td><td style="text-align:right" class="pos">+334</td><td style="text-align:right" class="pos">+114</td><td style="text-align:right" class="pos">+38</td><td style="text-align:right" class="pos">+486</td></tr>
+    <tr><td>07/06</td><td style="text-align:right" class="neg">-1,456</td><td style="text-align:right" class="pos">+251</td><td style="text-align:right" class="pos">+117</td><td style="text-align:right" class="neg">-1,088</td></tr>
+    <tr><td>07/07</td><td style="text-align:right" class="neg">-347</td><td style="text-align:right" class="pos">+93</td><td style="text-align:right" class="neg">-97</td><td style="text-align:right" class="neg">-351</td></tr>
+    <tr><td>07/08</td><td style="text-align:right" class="pos">+340</td><td style="text-align:right" class="pos">+100</td><td style="text-align:right" class="neg">-18</td><td style="text-align:right" class="pos">+422</td></tr>
+    <tr><td>07/09</td><td style="text-align:right" class="neg">-421</td><td style="text-align:right" class="pos">+116</td><td style="text-align:right" class="pos">+17</td><td style="text-align:right" class="neg">-288</td></tr>
+    <tr><td>07/13</td><td style="text-align:right" class="neg">-1</td><td style="text-align:right" class="pos">+15</td><td style="text-align:right" class="neg">-5</td><td style="text-align:right" class="pos">+9</td></tr>
+    <tr><td>07/14</td><td style="text-align:right" class="pos">+97</td><td style="text-align:right" class="pos">+39</td><td style="text-align:right" class="pos">+54</td><td style="text-align:right" class="pos">+190</td></tr>
+    <tr><td>07/15</td><td style="text-align:right" class="neg">-55</td><td style="text-align:right" class="pos">+101</td><td style="text-align:right" class="neg">-55</td><td style="text-align:right" class="neg">-9</td></tr>
+    <tr><td>07/16</td><td style="text-align:right" class="neg">-83</td><td style="text-align:right" class="pos">+10</td><td style="text-align:right" class="pos">+56</td><td style="text-align:right" class="neg">-17</td></tr>
+    <tr><td>07/17</td><td style="text-align:right" class="pos">+249</td><td style="text-align:right" class="pos">+39</td><td style="text-align:right" class="pos">+75</td><td style="text-align:right" class="pos">+364</td></tr>
+  </table>
+
+  <!-- 散戶估算 -->
+  <div style="margin-top:10px;padding:10px 14px;background:var(--surface0);border-radius:8px;font-size:13px">
+    <span style="color:var(--mauve);font-weight:700">散戶估算：</span>
+    Stage 1 估算之 chips_retail_est_volume 為 2,723 張（與當日總成交量相同）；因融資量細分欄位（chips_retail_margin_volume／chips_retail_cash_volume）為 N/A，散戶占比暫無法精確計算，建議以上表三大法人淨額作為主要判讀依據。
+  </div>
+</div>
+
+<!-- ⑧ 重大訊息（左半） -->
+<div class="card">
+  <div class="card-title">近期重大訊息</div>
+  <div class="tl">
+    <div class="tl-item tl-warn">
+      <div class="tl-date">2026/07/17</div>
+      <div class="tl-head">台股系統性股災，台光電同步跌停</div>
+      <div class="tl-body">加權指數暴跌2,953.71點（-6.47%），台光電收4,495元、重挫9.92%觸及跌停，量2,723張（約前5日均量2.4倍）；惟三大法人逆勢淨買364張承接，呈價跌籌碼淨買背離，屬大盤恐慌賣壓而非個股利空。</div>
+    </div>
+    <div class="tl-item tl-warn">
+      <div class="tl-date">2026/07/06</div>
+      <div class="tl-head">SemiAnalysis看空報告衝擊，天價後急殺跌停</div>
+      <div class="tl-body">股價盤中觸新高6,250元後遭空方報告重擊，翻黑收5,475元，量2,976張（約前5日均量2.3倍），單日震幅逾12%；Wyckoff判定為典型UTAD假突破派發訊號，隔日07/07跌破派發區下緣5,200元並放量3,815張確認賣壓。</div>
+    </div>
+    <div class="tl-item tl-key tl-ok">
+      <div class="tl-date">2026/07/03</div>
+      <div class="tl-head">法人CCL/PCB漲價評等催化，爆量收高</div>
+      <div class="tl-body">07/02旺得富理財網法人評等報告點名台光電等8檔CCL/PCB下半年漲價題材，隔日爆量2,789張（前5日均量1.42倍），收6,080元創高，外資、投信、自營三方合計淨買487張。</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">2026/07/04</div>
+      <div class="tl-head">公告2026年6月合併營收177.33億元，年增120.69%</div>
+      <div class="tl-body">連續第3個月正成長且逐月加速，反映AI高階CCL材料需求動能持續增強。</div>
+    </div>
+    <div class="tl-item tl-warn">
+      <div class="tl-date">2026/07/04</div>
+      <div class="tl-head">公告有價證券交易達「注意交易資訊標準」</div>
+      <div class="tl-body">因股價/成交量異常波動，依規定公告相關訊息以利投資人區別瞭解。</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">2026/07/04</div>
+      <div class="tl-head">代子公司台光電子材料(昆山)公告自地委建廠房工程案</div>
+      <div class="tl-body">子公司持續擴產投資，對應財務面自由現金流轉負（-517百萬元）之資本支出背景。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑨ 最新新聞（右半） -->
+<div class="card">
+  <div class="card-title">最新新聞</div>
+  <table>
+    <tr><th>#</th><th>新聞標題</th></tr>
+    <tr><td class="dim">1</td><td><a href="https://news.google.com/rss/articles/CBMiS0FVX3lxTFBaR0JuWnBfdTZHdnNGYnR5aE1FX3lGdnBsanhoU3QzU0tKUGRES0h0NWlZc3h1VVVzZlIxWXpPR0VvLWktUlVmVjNNbw?oc=5" target="_blank" style="color:var(--blue)">PCB血流成河！「這2檔」吞連6跌拖華通、台光電、欣興等13檔跌停 惟它連拔2根漲停（2026/07/17）</a></td></tr>
+    <tr><td class="dim">2</td><td><a href="https://news.google.com/rss/articles/CBMiiAFBVV95cUxOUC1lVVBwRlNrZjROd291ckFaWUt6d0lIMkNkTkNRMzZrQlNDNmtZcFZrUWF6S3VKeWJjTVo4TXBKYzFmV1B0UkJwU09keldwdUFSTGFSUVJ2RXg0ck4xTU9LYndRZUtHdGo2V2FPUnl4aFBHamN4V0lWQzhWbkg4TzVQcmdDSmZK?oc=5" target="_blank" style="color:var(--blue)">《電零組》注意股：台光電 近5日跌9.22%（2026/07/14）</a></td></tr>
+    <tr><td class="dim">3</td><td><a href="https://news.google.com/rss/articles/CBMiWEFVX3lxTE0tZFdmZjlYWGVXZ2VQQ2I1YnhOcmFGckdjS0owSU5yYWRzZGdxQzlzN0RHaWJodGdiU05XcTB6Q1pjTW9GNjJYbl8xNjJKNEZqUkN0WlcyZGI?oc=5" target="_blank" style="color:var(--blue)">2383 台光電：PCB 從配角變主角，中信台日韓PCB ETF 准募（2026/07/15）</a></td></tr>
+    <tr><td class="dim">4</td><td><a href="https://news.google.com/rss/articles/CBMiWEFVX3lxTE5tZTFra2hWU3dPUlNSaXV2RElNRlBlSWpqYVBwOUtfeUE1SV9LUnRPTEZISzRHOHQwUHhwYUVyOE43Q2JLZzkwTnRDSmEwdzNQcXVjbEdYZHo?oc=5" target="_blank" style="color:var(--blue)">財經青紅燈》台光電市值輾壓金控股的啟示（2026/07/11）</a></td></tr>
+    <tr><td class="dim">5</td><td><a href="https://news.google.com/rss/articles/CBMigAFBVV95cUxPYzA1X2xhRVl6RlFqcWNSbVU4ZEU2VHZjZ3VOTFJCbHFDNEFFaGRRanVzNllvc1F2ekM3MGhxenVIeFd1RTlGUXB1NjktdnJpeXNHaTRtMnRGQllIWThKS1kzSGppTDVXVUIyVmJGdlFBTG5SRnkxVGJsY2ppbzNSYQ?oc=5" target="_blank" style="color:var(--blue)">台光電(2383)急挫，AI 高階 CCL 先修正的是什麼-葉冠妤（2026/07/08）</a></td></tr>
+    <tr><td class="dim">6</td><td><a href="https://news.google.com/rss/articles/CBMiiAFBVV95cUxNeDFaTlBxT21LdHJ5U0xBZEZZRGNqOFg1ak1qSmdhYmYyamtMQUN1eTBKSWxxTGd5TU93X1VBc2xicC1OakNXaUc2Q0ZDOXFaQUx3cEx0d3lhT2VkNl9mdnZ0R3N6RmpKT2s1MkJwaUJvWUI2QUtZdmRMNDljV1dwZHk2Q1JJR3Za?oc=5" target="_blank" style="color:var(--blue)">《投信買超8-8》群創(101)、台光電(100)（2026/07/08）</a></td></tr>
+    <tr><td class="dim">7</td><td><a href="https://news.google.com/rss/articles/CBMiUEFVX3lxTFBzT3diUjYtVGFqeHFHdDlhclpiYjRvN2JoVXFSUllYVS0xSDlTSG45ZE1DQ3pGNnVUcDhjeFVBdG82NmFyNExXZ2IxYk91OTBF0gFWQVVfeXFMTW9kdHBZN1JXTzdVUV9YRXRrUVJVNk02Y2dxdUJaa0x6WHg5OEkzUVNzcV9IbDU3Q01McjNXN3F3NWJYS0FDcWZoU0hNcTMtbi1rTEpuVXc?oc=5" target="_blank" style="color:var(--blue)">台光電第1季EPS 14.9元 法人看好全年上看76.2元（2026/05/10）</a></td></tr>
+    <tr><td class="dim">8</td><td><a href="https://news.google.com/rss/articles/CBMiZ0FVX3lxTE5uNTJuSVlabEI1djZZR2pOUUtRU25TV0VxUVFmRjVWV3ZGcHFUaXEtdTlRZmx2eUxpbEZycWlfdXRZSWtiVThBc29HRF9CQjVOaWtabjYzNXk3UHhCQ0J0dEVMV1pPU2c?oc=5" target="_blank" style="color:var(--blue)">台光電(2383)暴漲213％列注意股！投信逆勢卡位，散戶還能追嗎？（2026/06/10）</a></td></tr>
+    <tr><td class="dim">9</td><td><a href="https://news.google.com/rss/articles/CBMidkFVX3lxTFA2SU9UOTJXdkl5aVpNNDFLUmlvc1FwWHFrSF9UQUdMeElZX0M4d3Zhc1hRZ3Zwb3B2SmY4N3c0M25kT0R4c3F2WTRndk5raUNfZjU0TzdWSjFvSl9YbFhiQlpFWVdDdTN2cFZHVXNCdm01OXI3dXc?oc=5" target="_blank" style="color:var(--blue)">Factset 最新調查：台光電(2383-TW)EPS預估上修至93.65元，預估目標價為6600元（2026/07/06）</a></td></tr>
+    <tr><td class="dim">10</td><td><a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE5uem9OSXJxMXphcEVWeEMzSkNQVm8xajRfYnQ3OXJIX3FoUWZicUhzcjllZnpmSFItRjI5Sk85NUlXUHViS3pfX05rVmNfa3FabldWMFcwLUl2Z9IBX0FVX3lxTE1Od0VfN19UaGs0enppTHVlWXBFMnhtendHS05KcFdyV0VsMTdiSXVXYWJEaFR6OW8zdVFXal95dE43NzNNazcyUV9OVzBkU1J2Qk9VOWFIbmZkdlFHeFow?oc=5" target="_blank" style="color:var(--blue)">台光電目標價 高盛喊6,000元（2026/05/01）</a></td></tr>
+  </table>
+</div>
+
+<!-- ⑩ AI 分析文字（full 寬） -->
+<div class="card full">
+  <div class="card-title">AI 多面向分析</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div>
+      <div style="font-size:11px;color:var(--blue);font-weight:700;text-transform:uppercase;margin-bottom:6px">技術面</div>
+      <div style="font-size:13px;color:var(--subtext0);line-height:1.6">現價4,495元位於三均線(MA5 4,932、MA20 5,367.5、MA60 5,032)之下，乖離MA20達-16.26%，今日重挫-9.92%並收在最低價，屬明顯弱勢。RSI(14) 36.19處中性偏弱區、尚未進入超賣。KD K12.85、D15.01同陷20以下超賣區且K&lt;D未見交叉。MACD DIF-63.99下穿DEA53.27、柱狀體-117.26持續放大為負，空方運行明確。下方支撐4,300元、上方壓力5,500元。技術面全面偏空，破線後若要止穩需先站回MA5(4,932)。</div>
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--green);font-weight:700;text-transform:uppercase;margin-bottom:6px">量能面</div>
+      <div style="font-size:13px;color:var(--subtext0);line-height:1.6">今日成交量2,723張，高於MA5(1,873)約1.45倍、MA20(1,822)約1.49倍、MA60(2,354)約1.16倍，單日量能明顯放大。惟60日均量趨勢萎縮，MA5已低於MA60；月均量M3:3,434→M2:2,686→M1:2,021張持續遞減，長線量能退潮。今日爆量1.5倍搭配-9.92%長黑，屬賣壓放量宣洩(量增價跌)；天量日20260319(5,620張)後至今累計仍漲55.5%，此波急殺為高檔獲利了結賣壓集中湧現。</div>
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--mauve);font-weight:700;text-transform:uppercase;margin-bottom:6px">籌碼面</div>
+      <div style="font-size:13px;color:var(--subtext0);line-height:1.6">今日(07/17)三大法人一致買超，外資+249張、投信+39張、自營+75張於急殺中承接；惟外資近10日仍淨賣1,343張、20日淨買541張，屬高檔調節後短線回補，投信連11日買超、10日累計+878張為結構性穩定買盤。融券餘額僅約57張、空方壓力輕微。融資餘額由2,080張降至1,643張去槓桿。千張大戶64戶、占比57.95%、週增3戶，散戶占比17.16%→16.62%同步下滑，籌碼向大戶集中。隱性主力score 0無異常、未見吸籌；上方5,530~6,080元看跌OB為壓力。</div>
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--yellow);font-weight:700;text-transform:uppercase;margin-bottom:6px">基本面</div>
+      <div style="font-size:13px;color:var(--subtext0);line-height:1.6">TTM EPS 45.85元；新聞顯示Q1 EPS 14.9元、法人估全年上看76.2元，獲利高速成長。估值偏高：PER 98.04倍、PBR 33.59倍，反映市場對高階CCL與AI材料的高成長預期；ROE 40.68%、BPS 133.8元顯示獲利能力極強。財務體質穩健：負債比34.45%屬健康、流動比1.328尚可，惟自由現金流-517百萬元為負（fin_fcf_signal警示），係擴產資本支出所致。整體體質良好，但近百倍本益比對成長持續性的容錯度偏低。</div>
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--peach);font-weight:700;text-transform:uppercase;margin-bottom:6px">營收面</div>
+      <div style="font-size:13px;color:var(--subtext0);line-height:1.6">6月營收17,732.96百萬元、YoY +120.69%、MoM +13.53%，為連續成長且YoY逐月加速（3月+56.63%、4月+93.61%、5月+114.62%、6月+120.69%）。2026上半年累計營收約80,342百萬元，去年同期約44,188百萬元，累計YoY約+81.82%，累計增速雖低於最新單月+120.69%，惟因年初基期月增速較低、YoY呈逐月遞增，顯示為AI高階材料需求驅動的動能持續增強，而非單月一次性爆發，成長週期已明確確立並加速，動能可信度高。</div>
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--teal);font-weight:700;text-transform:uppercase;margin-bottom:6px">新聞情緒</div>
+      <div style="font-size:13px;color:var(--subtext0);line-height:1.6">新聞情感分數0.17、標籤中性偏正，評等買進、調升。多空劇烈拉鋸：7/06 SemiAnalysis空方報告重擊，股價自天價6,250元殺至跌停、單日震幅逾12%，惟同日稍早傳奪輝達最大供應商利多，且本土投顧仍喊目標價7字頭、券商評等看多6,700元。7/13至7/15利多回溫：PCB 6月營收創高、Q2財報三率三升可期、法人調升目標價。7/17 PCB族群13檔跌停屬當日大盤重挫的系統性賣壓，非個股基本面利空。現價4,495元已自高點回檔約28%，短線消息面分歧、波動加劇。</div>
+    </div>
+  </div>
+
+  <!-- 看多 / 看空論點 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+    <div style="background:rgba(166,227,161,.07);border:1px solid rgba(166,227,161,.2);border-radius:8px;padding:14px">
+      <div style="color:var(--green);font-size:11px;font-weight:700;text-transform:uppercase;margin-bottom:8px">看多論點</div>
+      <div style="font-size:13px;color:var(--subtext0);line-height:1.7">
+        <div>• AI CCL需求動能扎實：6月營收YoY+120.69%逐月加速、上半年累計+81.82%。</div>
+        <div>• ROE 40.68%、TTM EPS 45.85元，獲利能力極強。</div>
+        <div>• 投信連11日買超、千張大戶占比升至57.95%，底層籌碼緩步集中。</div>
+        <div>• 基本面成長性支撐長線價值，題材與需求端未見轉弱。</div>
+      </div>
+    </div>
+    <div style="background:rgba(243,139,168,.07);border:1px solid rgba(243,139,168,.2);border-radius:8px;padding:14px">
+      <div style="color:var(--red);font-size:11px;font-weight:700;text-transform:uppercase;margin-bottom:8px">看空論點</div>
+      <div style="font-size:13px;color:var(--subtext0);line-height:1.7">
+        <div>• 估值缺乏安全邊際：PER 98.04倍、PBR 33.59倍極端偏高。</div>
+        <div>• 自由現金流轉負-517百萬元，獲利未能完全轉換為現金流入。</div>
+        <div>• 技術面現價4,495元跌破全部均線，Wyckoff自UTAD 6,250轉入回撤(Markdown)階段，已跌破結構失效價約28%。</div>
+        <div>• 分析師報告觸發「喊買出貨背離」旗標，外資近10日淨賣1,343張與升評方向背離。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 最終結論 -->
+  <div class="verdict" style="margin-top:16px">
+    <div class="vd-label">觀望</div>
+    <div class="vd-body">台光電(2383)現價4,495元，基本面與籌碼偏多、技術面偏空，委員會判定高衝突。成長動能真實(6月營收YoY+120.69%、ROE 40.68%)，投信撐盤、大戶集中；但PER 98.04倍估值極端、FCF轉負、技術結構自6,250元回撤約28%全面破壞，空方代言人高信心觸發估值過熱與結構失效。此波回檔主因估值修正與系統性股災(加權-6.47%)而非基本面轉壞，惟安全邊際不足，AI投資委員會綜合評分4/10、建議觀望。</div>
+  </div>
+</div>
+
+<!-- ⑪ 資料可信度（full 寬） -->
+<div class="card full">
+  <div class="card-title">資料來源與可信度</div>
+  <table>
+    <tr><th>模組</th><th>說明</th><th style="text-align:center">狀態</th><th>取得值摘要</th></tr>
+    <tr>
+      <td>即時股價</td>
+      <td class="dim">MIS API 即時報價與漲跌停</td>
+      <td style="text-align:center"><span class="tag t-g">✓ 成功</span></td>
+      <td class="dim" style="font-size:12px">4,495元，-9.92%，觸及跌停4,495.0</td>
+    </tr>
+    <tr>
+      <td>法人籌碼</td>
+      <td class="dim">FinMind／TWSE 三大法人日買賣超</td>
+      <td style="text-align:center"><span class="tag t-g">✓ 成功</span></td>
+      <td class="dim" style="font-size:12px">_chips.csv 完整涵蓋近10個交易日</td>
+    </tr>
+    <tr>
+      <td>財報 EPS（季度）</td>
+      <td class="dim">Goodinfo 季度 EPS 明細</td>
+      <td style="text-align:center"><span class="tag t-r">✗ 失敗</span></td>
+      <td class="dim" style="font-size:12px">主 CSV 未見 {year}Q{n}_EPS 欄位，僅有 TTM EPS 45.85元</td>
+    </tr>
+    <tr>
+      <td>財務健康度</td>
+      <td class="dim">Goodinfo 負債比／流動比／自由現金流</td>
+      <td style="text-align:center"><span class="tag t-y">△ 部分成功</span></td>
+      <td class="dim" style="font-size:12px">負債比34.45%、流動比1.328；ROA/毛利率/營益率/淨利率為N/A</td>
+    </tr>
+    <tr>
+      <td>月營收</td>
+      <td class="dim">MOPS 月營收公告</td>
+      <td style="text-align:center"><span class="tag t-g">✓ 成功</span></td>
+      <td class="dim" style="font-size:12px">_revenue.csv 涵蓋202502~202606共17個月</td>
+    </tr>
+    <tr>
+      <td>新聞來源</td>
+      <td class="dim">Yahoo股市新聞＋Google News RSS</td>
+      <td style="text-align:center"><span class="tag t-g">✓ 成功</span></td>
+      <td class="dim" style="font-size:12px">_news.csv 累計141則，相關15則／可信14則（07/04批次）</td>
+    </tr>
+    <tr>
+      <td>技術指標</td>
+      <td class="dim">Yahoo Chart API 日線＋MA/RSI/KD/MACD</td>
+      <td style="text-align:center"><span class="tag t-g">✓ 成功</span></td>
+      <td class="dim" style="font-size:12px">MA5/20/60、RSI14、KD、MACD 完整計算</td>
+    </tr>
+    <tr>
+      <td>千張大戶（TDCC）</td>
+      <td class="dim">股東持股分級週資料</td>
+      <td style="text-align:center"><span class="tag t-g">✓ 成功</span></td>
+      <td class="dim" style="font-size:12px">64戶、占比57.95%，資料日20260717</td>
+    </tr>
+    <tr>
+      <td>分析師報告</td>
+      <td class="dim">Factset 共識目標價／EPS修正軌跡</td>
+      <td style="text-align:center"><span class="tag t-g">✓ 成功</span></td>
+      <td class="dim" style="font-size:12px">共識目標價6,600元，觸發「喊買出貨背離」標籤</td>
+    </tr>
+    <tr>
+      <td>券商分點</td>
+      <td class="dim">_broker.csv 主力進出明細</td>
+      <td style="text-align:center"><span class="tag t-r">✗ 失敗</span></td>
+      <td class="dim" style="font-size:12px">僅07/16、07/17兩個交易日，未達3日門檻，暫無法判讀</td>
+    </tr>
+    <tr>
+      <td>外資持股比／借券餘額</td>
+      <td class="dim">FinMind 外資持股與券資比</td>
+      <td style="text-align:center"><span class="tag t-r">✗ 失敗</span></td>
+      <td class="dim" style="font-size:12px">chips_foreign_holding_pct_latest／chips_securities_lending_balance均為N/A</td>
+    </tr>
+    <tr>
+      <td>散戶三分法</td>
+      <td class="dim">融資／現股散戶拆分快照</td>
+      <td style="text-align:center"><span class="tag t-y">△ 部分成功</span></td>
+      <td class="dim" style="font-size:12px">chips_retail_est_volume=2,723張，融資／現股細分為N/A</td>
+    </tr>
+  </table>
+</div>
+
+</div><!-- end .rpt-body -->
+
+<!-- ⑫ Footer（必填） -->
+<div class="rpt-footer">
+  報告生成時間：2026-07-18 | 股票代號 2383 | 市場 上市 TSE<br>
+  資料來自公開免費平台（TWSE MIS、Goodinfo、Yahoo Finance、MOPS、Yahoo 股市新聞），僅供研究參考，不構成任何投資建議
+</div>
+</body>
+</html>
